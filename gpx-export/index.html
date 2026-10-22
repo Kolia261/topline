@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPX Экспорт маршрута — Омская область</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+        }
+        .header {
+            background: #FFD54F;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 22px;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        .header p {
+            font-size: 13px;
+            color: rgba(0,0,0,0.5);
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+        .card h3 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #555;
+        }
+        .points-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .point-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .point-row .num {
+            width: 28px;
+            height: 28px;
+            background: #FFD54F;
+            color: #1a1a1a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .point-row input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .point-row input:focus {
+            outline: none;
+            border-color: #FFD54F;
+        }
+        .point-row .coord {
+            width: 110px;
+        }
+        .point-row .name-input {
+            flex: 1;
+        }
+        .point-row button {
+            background: none;
+            border: none;
+            color: #c00;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .point-row button:hover {
+            background: rgba(200,0,0,0.1);
+        }
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-yellow {
+            background: #FFD54F;
+            color: #1a1a1a;
+        }
+        .btn-yellow:hover {
+            background: #FFC107;
+            transform: translateY(-1px);
+        }
+        .btn-green {
+            background: #43a047;
+            color: #fff;
+        }
+        .btn-green:hover {
+            background: #388e3c;
+            transform: translateY(-1px);
+        }
+        .btn-red {
+            background: #e53935;
+            color: #fff;
+        }
+        .btn-red:hover {
+            background: #c62828;
+        }
+        .btn-outline {
+            background: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .btn-outline:hover {
+            background: #f5f5f5;
+        }
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #FFD54F;
+        }
+        .preview {
+            background: #1a1a1a;
+            color: #4caf50;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 11px;
+            max-height: 300px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+        }
+        .import-area {
+            margin-bottom: 16px;
+        }
+        .divider {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>GPX Экспорт</h1>
+        <p>Маршрут по Омской области — выгрузка в GPX-файл</p>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>Точки маршрута</h2>
+
+            <div id="pointsList" class="points-list">
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-yellow" onclick="addPoint()">+ Добавить точку</button>
+                <button class="btn btn-outline" onclick="loadFromMainSite()">Загрузить из маршрута</button>
+                <button class="btn btn-outline" onclick="loadSample()">Пример маршрута</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Или вставьте JSON</h2>
+            <div class="import-area">
+                <textarea id="jsonInput" placeholder='[{"name":"Омск","lat":54.9885,"lng":73.3242},{"name":"Тара","lat":56.8833,"lng":74.3667}]'></textarea>
+                <div class="hint">Формат: JSON-массив объектов с полями name, lat, lng</div>
+            </div>
+            <button class="btn btn-yellow" onclick="importJson()">Импортировать</button>
+        </div>
+
+        <div class="card">
+            <h2>Экспорт</h2>
+            <div class="btn-row">
+                <button class="btn btn-green" onclick="exportGpx()">Скачать GPX</button>
+                <button class="btn btn-outline" onclick="previewGpx()">Просмотр</button>
+            </div>
+
+            <hr class="divider">
+
+            <div id="gpxPreview" style="display:none;">
+                <h3>GPX Preview</h3>
+                <div class="preview" id="gpxOutput"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var points = [];
+        var routeGeometry = [];
+        var pointId = 0;
+        var OSRM_URL = 'https://router.project-osrm.org/route/v1/driving/';
+
+        function fetchRouteGeometry(callback) {
+            if (points.length < 2) { callback([]); return; }
+            var coords = points.map(function(p) { return p.lng + ',' + p.lat; }).join(';');
+            var url = OSRM_URL + coords + '?overview=full&geometries=polyline';
+            fetch(url)
+                .then(function(resp) { return resp.json(); })
+                .then(function(data) {
+                    if (data.routes && data.routes.length > 0 && data.routes[0].geometry) {
+                        callback(decodePolyline(data.routes[0].geometry));
+                    } else {
+                        callback([]);
+                    }
+                })
+                .catch(function() { callback([]); });
+        }
+
+        function decodePolyline(encoded) {
+            var points = [];
+            var index = 0, lat = 0, lng = 0;
+            while (index < encoded.length) {
+                var b, shift = 0, result = 0;
+                do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+                var dlat = (result & 1) ? ~(result >> 1) : (result >> 1); lat += dlat;
+                shift = 0; result = 0;
+                do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+                var dlng = (result & 1) ? ~(result >> 1) : (result >> 1); lng += dlng;
+                points.push([lat / 1e5, lng / 1e5]);
+            }
+            return points;
+        }
+
+        function addPoint(name, lat, lng) {
+            name = name || '';
+            lat = lat || '';
+            lng = lng || '';
+
+            var id = ++pointId;
+            points.push({ id: id, name: name, lat: lat, lng: lng });
+            renderPoints();
+        }
+
+        function removePoint(id) {
+            points = points.filter(function(p) { return p.id !== id; });
+            renderPoints();
+        }
+
+        function renderPoints() {
+            var container = document.getElementById('pointsList');
+            container.innerHTML = '';
+
+            points.forEach(function(p, i) {
+                var row = document.createElement('div');
+                row.className = 'point-row';
+                row.innerHTML =
+                    '<span class="num">' + (i + 1) + '</span>' +
+                    '<input type="text" class="name-input" value="' + escHtml(p.name) + '" placeholder="Название" onchange="updatePoint(' + p.id + ', \'name\', this.value)">' +
+                    '<input type="text" class="coord" value="' + p.lat + '" placeholder="Широта" onchange="updatePoint(' + p.id + ', \'lat\', this.value)">' +
+                    '<input type="text" class="coord" value="' + p.lng + '" placeholder="Долгота" onchange="updatePoint(' + p.id + ', \'lng\', this.value)">' +
+                    '<button onclick="removePoint(' + p.id + ')">✕</button>';
+                container.appendChild(row);
+            });
+        }
+
+        function updatePoint(id, field, value) {
+            var p = points.find(function(p) { return p.id === id; });
+            if (p) p[field] = value;
+        }
+
+        function escHtml(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function loadSample() {
+            points = [];
+            pointId = 0;
+            var sample = [
+                { name: 'Омск', lat: 54.9885, lng: 73.3242 },
+                { name: 'Тара', lat: 56.8833, lng: 74.3667 },
+                { name: 'Исилькуль', lat: 54.9000, lng: 71.2667 },
+                { name: 'Крутинка', lat: 55.9667, lng: 71.4667 },
+                { name: 'Тюкалинск', lat: 55.8667, lng: 72.2000 },
+                { name: 'Калачинск', lat: 54.9333, lng: 74.5833 },
+                { name: 'Черлак', lat: 54.1500, lng: 74.8000 }
+            ];
+            sample.forEach(function(s) {
+                addPoint(s.name, s.lat, s.lng);
+            });
+        }
+
+        function loadFromMainSite() {
+            var routeStr = localStorage.getItem('omsk_route_points');
+            var geomStr = localStorage.getItem('omsk_route_geometry');
+            if (routeStr) {
+                try {
+                    var routeData = JSON.parse(routeStr);
+                    points = [];
+                    pointId = 0;
+                    routeData.forEach(function(p) {
+                        addPoint(p.name, p.lat, p.lng);
+                    });
+                    if (geomStr) {
+                        routeGeometry = JSON.parse(geomStr);
+                    }
+                    alert('Маршрут загружен! (' + points.length + ' точек, ' + routeGeometry.length + ' точек геометрии)');
+                } catch(e) {
+                    alert('Ошибка чтения данных.');
+                }
+            } else {
+                alert('Данные маршрута не найдены. Постройте маршрут на основном сайте.');
+            }
+        }
+
+        function importJson() {
+            var raw = document.getElementById('jsonInput').value.trim();
+            if (!raw) { alert('Вставьте JSON'); return; }
+            try {
+                var data = JSON.parse(raw);
+                if (!Array.isArray(data)) throw new Error('Not array');
+                points = [];
+                pointId = 0;
+                data.forEach(function(p) {
+                    addPoint(p.name || '', parseFloat(p.lat), parseFloat(p.lng));
+                });
+            } catch(e) {
+                alert('Ошибка JSON: ' + e.message);
+            }
+        }
+
+        function buildGpx(routeCoords) {
+            if (points.length === 0) { alert('Добавьте точки'); return null; }
+
+            var now = new Date().toISOString();
+            var gpx = '<?xml version="1.0" encoding="UTF-8"?>\n';
+            gpx += '<gpx version="1.1" creator="AltaiMarsRoute"\n';
+            gpx += '     xmlns="http://www.topografix.com/GPX/1/1"\n';
+            gpx += '     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n';
+            gpx += '     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">\n';
+            gpx += '  <metadata>\n';
+            gpx += '    <name>Маршрут по Омской области</name>\n';
+            gpx += '    <desc>Маршрут по Омской области</desc>\n';
+            gpx += '    <time>' + now + '</time>\n';
+            gpx += '  </metadata>\n\n';
+
+            points.forEach(function(p, i) {
+                gpx += '  <wpt lat="' + p.lat + '" lon="' + p.lng + '">\n';
+                gpx += '    <name>' + escXml(p.name || 'Точка ' + (i + 1)) + '</name>\n';
+                gpx += '  </wpt>\n';
+            });
+
+            if (routeCoords && routeCoords.length > 0) {
+                gpx += '\n  <trk>\n';
+                gpx += '    <name>Маршрут по Омской области</name>\n';
+                gpx += '    <trkseg>\n';
+                routeCoords.forEach(function(c) {
+                    gpx += '      <trkpt lat="' + c[0].toFixed(6) + '" lon="' + c[1].toFixed(6) + '"></trkpt>\n';
+                });
+                gpx += '    </trkseg>\n';
+                gpx += '  </trk>\n';
+            } else {
+                gpx += '\n  <trk>\n';
+                gpx += '    <name>Маршрут по Омской области</name>\n';
+                gpx += '    <trkseg>\n';
+                points.forEach(function(p) {
+                    gpx += '      <trkpt lat="' + p.lat + '" lon="' + p.lng + '"></trkpt>\n';
+                });
+                gpx += '    </trkseg>\n';
+                gpx += '  </trk>\n';
+            }
+
+            gpx += '</gpx>';
+            return gpx;
+        }
+
+        function escXml(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+        }
+
+        function previewGpx() {
+            if (points.length === 0) { alert('Добавьте точки'); return; }
+            document.getElementById('gpxOutput').textContent = 'Загрузка маршрута по дорогам...';
+            document.getElementById('gpxPreview').style.display = 'block';
+            fetchRouteGeometry(function(coords) {
+                var gpx = buildGpx(coords);
+                document.getElementById('gpxOutput').textContent = gpx;
+            });
+        }
+
+        function exportGpx() {
+            if (points.length === 0) { alert('Добавьте точки'); return; }
+            fetchRouteGeometry(function(coords) {
+                var gpx = buildGpx(coords);
+                var blob = new Blob([gpx], { type: 'application/gpx+xml' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'omsk_route.gpx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        addPoint('Омск', 54.9885, 73.3242);
+    </script>
+</body>
+</html>
