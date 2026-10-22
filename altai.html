@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru-RU">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Омская область — маршрут с Топлайн</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="header">
+    <div class="header-top">
+        <div class="container">
+            <a class="logo1" href="altai.html" aria-label="Топлайн">
+                <img src="img/logo.png" alt="Топлайн" class="topline-logo">
+            </a>
+            <div class="title-wrapper">
+                <div class="header-title">Омская область</div>
+                <p class="header-subtitle">Путешествуй по Сибири с Топлайн</p>
+            </div>
+            <div class="logo2">
+                <span class="region-brand">ОМСКАЯ ОБЛАСТЬ</span>
+            </div>
+        </div>
+    </div>
+    <div class="header-bottom">
+        <div class="container">
+            <nav>
+                <a href="#" class="active">Маршрут по Омской области</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section class="place_banner_section">
+    <div class="place_banner omsk_banner">
+        <div class="content_banner">
+            <p>Омская область<br><span style="font-size:16px;font-weight:400;">АЗС, достопримечательности и места отдыха</span></p>
+        </div>
+    </div>
+</section>
+
+<section class="map_section">
+    <div class="map_container">
+        <div class="map_main">
+            <div class="map_sidebar">
+                <div class="map_sidebar_wrap_scroll">
+                    <div class="map_sidebar_wrap">
+                        <div class="sidebar-section">
+                            <div class="sidebar-section-title">Точка старта</div>
+                            <div class="start_point_display">
+                                <span class="start_icon">С</span>
+                                <span class="start_name">Омск</span>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section" id="routePointsSection" style="display:none;">
+                            <div class="sidebar-section-title">Мой маршрут</div>
+                            <div id="routePointsList" class="route_points_list"></div>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <div class="sidebar-section-title">Добавить в маршрут</div>
+                            <div class="category_buttons">
+                                <button class="category_btn active" data-category="azs">
+                                    <img class="cat_icon" src="img/icon-azs.svg" alt="">
+                                    <span class="cat_label">АЗС</span>
+                                </button>
+                                <button class="category_btn" data-category="motel">
+                                    <img class="cat_icon" src="img/icon-hotel.svg" alt="">
+                                    <span class="cat_label">Отдых и ночлег</span>
+                                </button>
+                                <button class="category_btn" data-category="cafe">
+                                    <img class="cat_icon" src="img/icon-cafe.svg" alt="">
+                                    <span class="cat_label">Кафе</span>
+                                </button>
+                                <button class="category_btn" data-category="interesting_places">
+                                    <img class="cat_icon" src="img/icon-places.svg" alt="">
+                                    <span class="cat_label">Достопримечательности</span>
+                                </button>
+                            </div>
+                            <div id="categoryObjects" class="category_objects_list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="open_in_navigator" id="openInNavigator">
+                    Перейти в навигатор
+                </div>
+                <a href="gpx-export/index.html" target="_blank" class="open_in_gpx">
+                    Скачать GPX
+                </a>
+            </div>
+
+            <div class="map_sidebar_places">
+                <div class="msp_scroll">
+                    <div class="msp_wrap" id="infoPanel">
+                        <div class="msp_placeholder">
+                            <p>Выберите объект для просмотра информации</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="map" class="map"></div>
+        </div>
+    </div>
+</section>
+
+<script src="https://api-maps.yandex.ru/2.1/?apikey=447c4c63-4f90-4cd6-9551-92daa2cf15cc&lang=ru_RU&modules=router"></script>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
