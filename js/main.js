@@ -109,7 +109,7 @@ function renderCategoryObjects() {
 
 function getObjectPlaceholder(type) {
     switch (type) {
-        case 'azs': return 'img/azx.png';
+        case 'azs': return 'img/azx.PNG';
         case 'motel': return 'img/hotel-placeholder.svg';
         case 'cafe': return 'img/cafe-placeholder.svg';
         default: return 'img/place-placeholder.svg';
